@@ -24,7 +24,10 @@ function updateJSON($filename, $value) {
     $data = json_decode(file_get_contents("_ksiazki/$filename.json"), true) ?? [];
     if (!in_array($value, $data)) {
         $data[] = $value;
-        file_put_contents("_ksiazki/$filename.json", json_encode($data, JSON_PRETTY_PRINT));
+        if (file_put_contents("_ksiazki/$filename.json", json_encode($data, JSON_PRETTY_PRINT)) === false) {
+            // Obsługa błędu podczas zapisu do pliku
+            echo '<div class="alert alert-danger" role="alert">Błąd podczas aktualizacji pliku JSON: ' . $filename . '</div>';
+        }
     }
 }
 
@@ -378,10 +381,13 @@ if (isset($_POST['addMetadataForm'])) {
         'mobiFile' => $file . '.mobi'
     ];
 
-    file_put_contents('_ksiazki/bookData.json', json_encode($bookData, JSON_PRETTY_PRINT));
-
-    // Wyświetlenie komunikatu o zaktualizowaniu metadanych
-    echo '<div class="alert alert-success" role="alert">Metadane zostały zaktualizowane. Pliki JSON zostały zaktualizowane.</div>';
+    if (file_put_contents('_ksiazki/bookData.json', json_encode($bookData, JSON_PRETTY_PRINT)) === false) {
+        // Obsługa błędu podczas zapisu do pliku
+        echo '<div class="alert alert-danger" role="alert">Błąd podczas aktualizacji pliku JSON: bookData.json</div>';
+    } else {
+        // Wyświetlenie komunikatu o zaktualizowaniu metadanych
+        echo '<div class="alert alert-success" role="alert">Metadane zostały zaktualizowane. Pliki JSON zostały zaktualizowane.</div>';
+    }
 }
 
 // Obsługa formularza edycji metadanych
@@ -423,10 +429,13 @@ if (isset($_POST['editMetadataForm'])) {
         updateJSON('series', $newSeries);
     }
 
-    file_put_contents('_ksiazki/bookData.json', json_encode($bookData, JSON_PRETTY_PRINT));
-
-    // Wyświetlenie komunikatu o zaktualizowaniu metadanych
-    echo '<div class="alert alert-success" role="alert">Metadane zostały zaktualizowane. Pliki JSON zostały zaktualizowane.</div>';
+    if (file_put_contents('_ksiazki/bookData.json', json_encode($bookData, JSON_PRETTY_PRINT)) === false) {
+        // Obsługa błędu podczas zapisu do pliku
+        echo '<div class="alert alert-danger" role="alert">Błąd podczas aktualizacji pliku JSON: bookData.json</div>';
+    } else {
+        // Wyświetlenie komunikatu o zaktualizowaniu metadanych
+        echo '<div class="alert alert-success" role="alert">Metadane zostały zaktualizowane. Pliki JSON zostały zaktualizowane.</div>';
+    }
 }
 
 // Wyświetlenie statusu, zakładek, formularzy i tabeli
