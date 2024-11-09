@@ -1,6 +1,6 @@
 <?php
     $files = scandir('_ksiazki');
-    $bookDataExists = file_exists('_ksiazki/bookData.json');
+    $bookData = json_decode(file_get_contents('_ksiazki/bookData.json'), true) ?? [];
 
     // Generowanie pliku ksiazki.php
     if (isset($_POST['generateKsiazki'])) {
@@ -93,6 +93,102 @@
             file_put_contents('_ksiazki/bookData.json', json_encode([$newBook], JSON_PRETTY_PRINT));
         }
     }
+
+    // Lista plików MOBI bez metadanych
+    $mobiFilesWithoutMetadata = [];
+    foreach ($files as $file) {
+        if (pathinfo($file, PATHINFO_EXTENSION) === 'mobi' && !array_key_exists($file, $bookData)) {
+            $mobiFilesWithoutMetadata[] = $file;
+        }
+    }
+
+    // Stronnkowanie
+    $itemsPerPage = 10;
+    $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $totalPages = ceil(count($mobiFilesWithoutMetadata) / $itemsPerPage);
+    $start = ($currentPage - 1) * $itemsPerPage;
+    $end = min($start + $itemsPerPage, count($mobiFilesWithoutMetadata));
+    $mobiFilesWithoutMetadata = array_slice($mobiFilesWithoutMetadata, $start, $end);
+
+    // Wyświetl tabelę
+    echo '<table>';
+    echo '<thead><tr><th>Plik MOBI</th><th>Edytuj</th></tr></thead>';
+    echo '<tbody>';
+    foreach ($mobiFilesWithoutMetadata as $file) {
+        echo '<tr>';
+        echo '<td>' . $file . '</td>';
+        echo '<td><a href="?action=edit&file=' . urlencode($file) . '">Edytuj</a></td>';
+        echo '</tr>';
+    }
+    echo '</tbody>';
+    echo '</table>';
+
+    // Dodaj paginację
+    if ($totalPages > 1) {
+        echo '<div class="pagination">';
+        for ($i = 1; $i <= $totalPages; $i++) {
+            echo '<a href="?page=' . $i . '">' . $i . '</a>';
+        }
+        echo '</div>';
+    }
+
+    // Formularz edycji
+    if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['file'])) {
+        $file = $_GET['file'];
+        $book = $bookData[$file] ?? [];
+        echo '<form method="POST" action="?action=save&file=' . urlencode($file) . '">';
+        echo '<input type="hidden" name="file" value="' . $file . '">';
+        echo '<div class="form-group">';
+        echo '<label for="title">Tytuł:</label>';
+        echo '<input type="text" class="form-control" id="title" name="title" value="' . htmlspecialchars($book['title']) . '">';
+        echo '</div>';
+        echo '<div class="form-group">';
+        echo '<label for="cycle">Cykl:</label>';
+        echo '<input type="text" class="form-control" id="cycle" name="cycle" value="' . htmlspecialchars($book['cycle']) . '">';
+        echo '</div>';
+        echo '<div class="form-group">';
+        echo '<label for="author">Autor:</label>';
+        echo '<input type="text" class="form-control" id="author" name="author" value="' . htmlspecialchars($book['author']) . '">';
+        echo '</div>';
+        echo '<div class="form-group">';
+        echo '<label for="genre">Gatunek:</label>';
+        echo '<input type="text" class="form-control" id="genre" name="genre" value="' . htmlspecialchars($book['genre']) . '">';
+        echo '</div>';
+        echo '<div class="form-group">';
+        echo '<label for="dateAdded">Data dodania:</label>';
+        echo '<input type="date" class="form-control" id="dateAdded" name="dateAdded" value="' . htmlspecialchars($book['dateAdded']) . '">';
+        echo '</div>';
+        echo '<div class="form-group">';
+        echo '<label for="recommend">Polecam:</label>';
+        echo '<select class="form-control" id="recommend" name="recommend">';
+        echo '<option value="tak"' . ($book['recommend'] === 'tak' ? ' selected' : '') . '>Tak</option>';
+        echo '<option value="nie"' . ($book['recommend'] === 'nie' ? ' selected' : '') . '>Nie</option>';
+        echo '</select>';
+        echo '</div>';
+        echo '<button type="submit" class="btn btn-primary">Zapisz</button>';
+        echo '</form>';
+    }
+
+    // Zapisywanie danych
+    if (isset($_POST['action']) && $_POST['action'] === 'save' && isset($_POST['file'])) {
+        $file = $_POST['file'];
+        $bookData = json_decode(file_get_contents('_ksiazki/bookData.json'), true) ?? [];
+        $bookData[$file] = [
+            'title' => $_POST['title'],
+            'cycle' => $_POST['cycle'],
+            'author' => $_POST['author'],
+            'genre' => $_POST['genre'],
+            'dateAdded' => $_POST['dateAdded'],
+            'recommend' => $_POST['recommend'],
+            'httpLink' => 'http://' . $_SERVER['HTTP_HOST'] . '/_ksiazki/' . $file,
+            'httpsLink' => 'https://' . $_SERVER['HTTP_HOST'] . '/_ksiazki/' . $file
+        ];
+        file_put_contents('_ksiazki/bookData.json', json_encode($bookData, JSON_PRETTY_PRINT));
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit;
+    }
+
+    // ... (reszta kodu) ...
 
 ?>
 
