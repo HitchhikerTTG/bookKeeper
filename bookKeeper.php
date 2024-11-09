@@ -48,6 +48,52 @@
 
         echo "Plik ksiazki.php został wygenerowany!";
     }
+
+    // Obsługa formularza dodawania książki
+    if (isset($_POST['addBookForm'])) {
+        // Pobranie danych z formularza
+        $title = $_POST['title'];
+        $cycle = $_POST['cycle'];
+        $author = $_POST['author'];
+        $genre = $_POST['genre'];
+        $dateAdded = $_POST['dateAdded'];
+        $recommend = $_POST['recommend'];
+        $httpLink = $_POST['httpLink'];
+        $httpsLink = $_POST['httpsLink'];
+        $mobiFile = $_FILES['mobiFile']['name'];
+
+        // Przetworzenie pliku mobi
+        move_uploaded_file($_FILES['mobiFile']['tmp_name'], '_ksiazki/' . $mobiFile);
+
+        // Stworzenie obiektu książki
+        $newBook = [
+            'title' => $title,
+            'cycle' => $cycle,
+            'author' => $author,
+            'genre' => $genre,
+            'dateAdded' => $dateAdded,
+            'recommend' => $recommend,
+            'httpLink' => $httpLink,
+            'httpsLink' => $httpsLink,
+            'mobiFile' => $mobiFile 
+        ];
+
+        // Sprawdzenie, czy plik bookData.json istnieje
+        if ($bookDataExists) {
+            // Wczytanie danych z pliku bookData.json
+            $bookData = json_decode(file_get_contents('_ksiazki/bookData.json'), true);
+
+            // Dodanie nowej książki do tablicy
+            $bookData[] = $newBook;
+
+            // Zapisanie zaktualizowanych danych do pliku bookData.json
+            file_put_contents('_ksiazki/bookData.json', json_encode($bookData, JSON_PRETTY_PRINT));
+        } else {
+            // Tworzenie nowego pliku bookData.json z nową książką
+            file_put_contents('_ksiazki/bookData.json', json_encode([$newBook], JSON_PRETTY_PRINT));
+        }
+    }
+
 ?>
 
 <!DOCTYPE html>
@@ -71,7 +117,11 @@
         ?>
 
         <h2>Dodaj nową książkę</h2>
-        <form id="addBookForm">
+        <form id="addBookForm" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="mobiFile">Plik Mobi:</label>
+                <input type="file" class="form-control-file" id="mobiFile" name="mobiFile">
+            </div>
             <div class="form-group">
                 <label for="title">Tytuł:</label>
                 <input type="text" class="form-control" id="title" name="title" required>
@@ -107,7 +157,7 @@
                 <label for="httpsLink">Link HTTPS (Mobi):</label>
                 <input type="text" class="form-control" id="httpsLink" name="httpsLink" required>
             </div>
-            <button type="submit" class="btn btn-primary">Dodaj książkę</button>
+            <button type="submit" class="btn btn-primary" name="addBookForm">Dodaj książkę</button>
         </form>
 
         <!-- Form for generating ksiazki.php -->
@@ -160,6 +210,7 @@
             const recommend = document.getElementById('recommend').value;
             const httpLink = document.getElementById('httpLink').value;
             const httpsLink = document.getElementById('httpsLink').value;
+            const mobiFile = document.getElementById('mobiFile').files[0]; // Pobranie pliku mobi
 
             // Stworzenie obiektu książki
             const newBook = {
@@ -170,7 +221,8 @@
                 dateAdded: dateAdded,
                 recommend: recommend,
                 httpLink: httpLink,
-                httpsLink: httpsLink
+                httpsLink: httpsLink,
+                mobiFile: mobiFile.name // Dodanie nazwy pliku mobi do obiektu książki
             };
 
             // Sprawdzenie, czy plik bookData.json istnieje
@@ -264,6 +316,7 @@
                             <label for="httpsLink">Link HTTPS (Mobi):</label>
                             <input type="text" class="form-control" id="httpsLink" name="httpsLink" value="${bookToEdit.httpsLink}" required>
                         </div>
+                        <input type="hidden" name="editIndex" value="${index}"> 
                         <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
                     `;
 
@@ -283,9 +336,10 @@
                         const recommend = document.getElementById('recommend').value;
                         const httpLink = document.getElementById('httpLink').value;
                         const httpsLink = document.getElementById('httpsLink').value;
+                        const editIndex = document.querySelector('input[name="editIndex"]').value; // Pobranie indexu książki do edycji
 
                         // Zaktualizowanie danych książki
-                        data[index] = {
+                        data[editIndex] = {
                             title: title,
                             cycle: cycle,
                             author: author,
@@ -302,4 +356,18 @@
                             method: 'POST',
                             body: jsonData,
                             headers: {
-                                'Content-Type': 'application/
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(() => {
+                            // Odświeżenie strony po dodaniu książki
+                            location.reload();
+                        })
+                        .catch(error => console.error('Błąd podczas zapisywania do pliku:', error));
+                    });
+                })
+                .catch(error => console.error('Błąd podczas wczytywania danych:', error));
+        }
+    </script>
+</body>
+</html>
