@@ -356,15 +356,21 @@ if (isset($_POST['addMetadataForm'])) {
     // Dodanie autora, gatunku i serii do plików JSON
     $newAuthor = $_POST['newAuthor'];
     if (!empty($newAuthor)) {
-        updateJSON('authors', $newAuthor);
+        if (file_put_contents("_ksiazki/authors.json", json_encode(array_merge(json_decode(file_get_contents("_ksiazki/authors.json"), true), [$newAuthor]), JSON_PRETTY_PRINT)) === false) {
+            echo '<div class="alert alert-danger" role="alert">Błąd podczas aktualizacji pliku JSON: authors.json</div>';
+        }
     }
     $newGenre = $_POST['newGenre'];
     if (!empty($newGenre)) {
-        updateJSON('genres', $newGenre);
+        if (file_put_contents("_ksiazki/genres.json", json_encode(array_merge(json_decode(file_get_contents("_ksiazki/genres.json"), true), [$newGenre]), JSON_PRETTY_PRINT)) === false) {
+            echo '<div class="alert alert-danger" role="alert">Błąd podczas aktualizacji pliku JSON: genres.json</div>';
+        }
     }
     $newSeries = $_POST['newSeries'];
     if (!empty($newSeries)) {
-        updateJSON('series', $newSeries);
+        if (file_put_contents("_ksiazki/series.json", json_encode(array_merge(json_decode(file_get_contents("_ksiazki/series.json"), true), [$newSeries]), JSON_PRETTY_PRINT)) === false) {
+            echo '<div class="alert alert-danger" role="alert">Błąd podczas aktualizacji pliku JSON: series.json</div>';
+        }
     }
 
     // Dodanie metadanych do bookData.json
@@ -418,15 +424,21 @@ if (isset($_POST['editMetadataForm'])) {
     // Dodanie autora, gatunku i serii do plików JSON
     $newAuthor = $_POST['newAuthor'];
     if (!empty($newAuthor)) {
-        updateJSON('authors', $newAuthor);
+        if (file_put_contents("_ksiazki/authors.json", json_encode(array_merge(json_decode(file_get_contents("_ksiazki/authors.json"), true), [$newAuthor]), JSON_PRETTY_PRINT)) === false) {
+            echo '<div class="alert alert-danger" role="alert">Błąd podczas aktualizacji pliku JSON: authors.json</div>';
+        }
     }
     $newGenre = $_POST['newGenre'];
     if (!empty($newGenre)) {
-        updateJSON('genres', $newGenre);
+        if (file_put_contents("_ksiazki/genres.json", json_encode(array_merge(json_decode(file_get_contents("_ksiazki/genres.json"), true), [$newGenre]), JSON_PRETTY_PRINT)) === false) {
+            echo '<div class="alert alert-danger" role="alert">Błąd podczas aktualizacji pliku JSON: genres.json</div>';
+        }
     }
     $newSeries = $_POST['newSeries'];
     if (!empty($newSeries)) {
-        updateJSON('series', $newSeries);
+        if (file_put_contents("_ksiazki/series.json", json_encode(array_merge(json_decode(file_get_contents("_ksiazki/series.json"), true), [$newSeries]), JSON_PRETTY_PRINT)) === false) {
+            echo '<div class="alert alert-danger" role="alert">Błąd podczas aktualizacji pliku JSON: series.json</div>';
+        }
     }
 
     if (file_put_contents('_ksiazki/bookData.json', json_encode($bookData, JSON_PRETTY_PRINT)) === false) {
