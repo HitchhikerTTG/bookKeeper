@@ -42,7 +42,7 @@ function generateBookTable($books, $page, $perPage, $isMetadata = true) {
 
     if ($isMetadata) {
         $table = '
-            <table class="table">
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>Tytuł</th>
@@ -57,7 +57,7 @@ function generateBookTable($books, $page, $perPage, $isMetadata = true) {
                 <tr>
                     <td>' . $book['title'] . '</td>
                     <td>[' . $book['author'] . ']</td>
-                    <td><a href="#editBookModal" data-toggle="modal" data-book-id="' . getMobiFileName($book['httpLink']) . '">Edytuj</a></td>
+                    <td><a href="#editBookModal" data-toggle="modal" data-book-id="' . getMobiFileName($book['mobiFile']) . '">Edytuj</a></td>
                 </tr>
             ';
         }
@@ -67,7 +67,7 @@ function generateBookTable($books, $page, $perPage, $isMetadata = true) {
         ';
     } else {
         $table = '
-            <table class="table">
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>Plik Mobi</th>
@@ -343,7 +343,8 @@ if (isset($_POST['addMetadataForm'])) {
         'recommend' => $recommend,
         'dateAdded' => $dateAdded,
         'httpLink' => 'http://' . $_SERVER['HTTP_HOST'] . '/_ksiazki/' . $file . '.mobi',
-        'httpsLink' => 'https://' . $_SERVER['HTTP_HOST'] . '/_ksiazki/' . $file . '.mobi'
+        'httpsLink' => 'https://' . $_SERVER['HTTP_HOST'] . '/_ksiazki/' . $file . '.mobi',
+        'mobiFile' => $file . '.mobi'
     ];
 
     file_put_contents('_ksiazki/bookData.json', json_encode($bookData, JSON_PRETTY_PRINT));
@@ -373,7 +374,8 @@ if (isset($_POST['editMetadataForm'])) {
         'recommend' => $recommend,
         'dateAdded' => $dateAdded,
         'httpLink' => 'http://' . $_SERVER['HTTP_HOST'] . '/_ksiazki/' . $file . '.mobi',
-        'httpsLink' => 'https://' . $_SERVER['HTTP_HOST'] . '/_ksiazki/' . $file . '.mobi'
+        'httpsLink' => 'https://' . $_SERVER['HTTP_HOST'] . '/_ksiazki/' . $file . '.mobi',
+        'mobiFile' => $file . '.mobi'
     ];
 
     file_put_contents('_ksiazki/bookData.json', json_encode($bookData, JSON_PRETTY_PRINT));
