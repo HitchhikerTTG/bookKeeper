@@ -197,6 +197,10 @@ $addBookForm = '
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="newAuthor">Nowy autor:</label>
+                            <input type="text" class="form-control" id="newAuthor" name="newAuthor">
+                        </div>
+                        <div class="form-group">
                             <label for="genre">Gatunek:</label>
                             <select class="form-control" id="genre" name="genre">
                                 <option value="">Wybierz gatunek</option>
@@ -208,6 +212,10 @@ $addBookForm = '
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="newGenre">Nowy gatunek:</label>
+                            <input type="text" class="form-control" id="newGenre" name="newGenre">
+                        </div>
+                        <div class="form-group">
                             <label for="series">Cykl:</label>
                             <select class="form-control" id="series" name="series">
                                 <option value="">Wybierz cykl</option>
@@ -217,6 +225,10 @@ $addBookForm = '
                                 }
                                 $addBookForm .= '
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newSeries">Nowy cykl:</label>
+                            <input type="text" class="form-control" id="newSeries" name="newSeries">
                         </div>
                         <div class="form-group">
                             <label for="seriesPosition">Pozycja w cyklu:</label>
@@ -271,6 +283,10 @@ $editBookForm = '
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="newAuthor">Nowy autor:</label>
+                            <input type="text" class="form-control" id="newAuthor" name="newAuthor">
+                        </div>
+                        <div class="form-group">
                             <label for="genre">Gatunek:</label>
                             <select class="form-control" id="genre" name="genre">
                                 <option value="">Wybierz gatunek</option>
@@ -282,6 +298,10 @@ $editBookForm = '
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="newGenre">Nowy gatunek:</label>
+                            <input type="text" class="form-control" id="newGenre" name="newGenre">
+                        </div>
+                        <div class="form-group">
                             <label for="series">Cykl:</label>
                             <select class="form-control" id="series" name="series">
                                 <option value="">Wybierz cykl</option>
@@ -291,6 +311,10 @@ $editBookForm = '
                                 }
                                 $editBookForm .= '
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newSeries">Nowy cykl:</label>
+                            <input type="text" class="form-control" id="newSeries" name="newSeries">
                         </div>
                         <div class="form-group">
                             <label for="seriesPosition">Pozycja w cyklu:</label>
@@ -327,9 +351,18 @@ if (isset($_POST['addMetadataForm'])) {
     $dateAdded = $_POST['dateAdded'];
 
     // Dodanie autora, gatunku i serii do plików JSON
-    updateJSON('authors', $author);
-    updateJSON('genres', $genre);
-    updateJSON('series', $series);
+    $newAuthor = $_POST['newAuthor'];
+    if (!empty($newAuthor)) {
+        updateJSON('authors', $newAuthor);
+    }
+    $newGenre = $_POST['newGenre'];
+    if (!empty($newGenre)) {
+        updateJSON('genres', $newGenre);
+    }
+    $newSeries = $_POST['newSeries'];
+    if (!empty($newSeries)) {
+        updateJSON('series', $newSeries);
+    }
 
     // Dodanie metadanych do bookData.json
     $bookData[$file] = [
@@ -376,6 +409,20 @@ if (isset($_POST['editMetadataForm'])) {
         'mobiFile' => $file . '.mobi'
     ];
 
+    // Dodanie autora, gatunku i serii do plików JSON
+    $newAuthor = $_POST['newAuthor'];
+    if (!empty($newAuthor)) {
+        updateJSON('authors', $newAuthor);
+    }
+    $newGenre = $_POST['newGenre'];
+    if (!empty($newGenre)) {
+        updateJSON('genres', $newGenre);
+    }
+    $newSeries = $_POST['newSeries'];
+    if (!empty($newSeries)) {
+        updateJSON('series', $newSeries);
+    }
+
     file_put_contents('_ksiazki/bookData.json', json_encode($bookData, JSON_PRETTY_PRINT));
 
     // Wyświetlenie komunikatu o zaktualizowaniu metadanych
@@ -403,6 +450,9 @@ echo '
                 var seriesPosition = $("#seriesPosition").val();
                 var recommend = $("#recommend").val();
                 var dateAdded = $("#dateAdded").val();
+                var newAuthor = $("#newAuthor").val();
+                var newGenre = $("#newGenre").val();
+                var newSeries = $("#newSeries").val();
                 $.ajax({
                     url: "bookManager.php",
                     type: "POST",
@@ -415,7 +465,10 @@ echo '
                         series: series,
                         seriesPosition: seriesPosition,
                         recommend: recommend,
-                        dateAdded: dateAdded
+                        dateAdded: dateAdded,
+                        newAuthor: newAuthor,
+                        newGenre: newGenre,
+                        newSeries: newSeries
                     },
                     success: function(response) {
                         $("#addBookModal").modal("hide");
@@ -436,6 +489,9 @@ echo '
                 var seriesPosition = $("#seriesPosition").val();
                 var recommend = $("#recommend").val();
                 var dateAdded = $("#dateAdded").val();
+                var newAuthor = $("#newAuthor").val();
+                var newGenre = $("#newGenre").val();
+                var newSeries = $("#newSeries").val();
                 $.ajax({
                     url: "bookManager.php",
                     type: "POST",
@@ -448,7 +504,10 @@ echo '
                         series: series,
                         seriesPosition: seriesPosition,
                         recommend: recommend,
-                        dateAdded: dateAdded
+                        dateAdded: dateAdded,
+                        newAuthor: newAuthor,
+                        newGenre: newGenre,
+                        newSeries: newSeries
                     },
                     success: function(response) {
                         $("#editBookModal").modal("hide");
