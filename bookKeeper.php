@@ -189,15 +189,12 @@ $addBookForm = '
                             <input type="text" class="form-control" id="title" name="title">
                         </div>
                         <div class="form-group">
-                            <label for="author">Autor:</label>
-                            <select class="form-control" id="author" name="author">
-                                <option value="">Wybierz autora</option>
-                                ';
-                                foreach ($authors as $author) {
-                                    $addBookForm .= '<option value="' . $author . '">' . $author . '</option>';
-                                }
-                                $addBookForm .= '
-                            </select>
+                            <label for="firstName">Imię autora:</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName">
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Nazwisko autora:</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName">
                         </div>
                         <div class="form-group">
                             <label for="newAuthor">Nowy autor:</label>
@@ -275,15 +272,12 @@ $editBookForm = '
                             <input type="text" class="form-control" id="title" name="title">
                         </div>
                         <div class="form-group">
-                            <label for="author">Autor:</label>
-                            <select class="form-control" id="author" name="author">
-                                <option value="">Wybierz autora</option>
-                                ';
-                                foreach ($authors as $author) {
-                                    $editBookForm .= '<option value="' . $author . '">' . $author . '</option>';
-                                }
-                                $editBookForm .= '
-                            </select>
+                            <label for="firstName">Imię autora:</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName">
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Nazwisko autora:</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName">
                         </div>
                         <div class="form-group">
                             <label for="newAuthor">Nowy autor:</label>
@@ -346,7 +340,8 @@ $editBookForm = '
 if (isset($_POST['addMetadataForm'])) {
     $file = $_POST['file'];
     $title = $_POST['title'];
-    $author = $_POST['author'];
+    $firstName = $_POST['firstName'];
+    $lastName = $_POST['lastName'];
     $genre = $_POST['genre'];
     $series = $_POST['series'];
     $seriesPosition = $_POST['seriesPosition'];
@@ -376,7 +371,7 @@ if (isset($_POST['addMetadataForm'])) {
     // Dodanie metadanych do bookData.json
     $bookData[$file] = [
         'title' => $title,
-        'author' => $author,
+        'author' => $firstName . ' ' . $lastName,
         'genre' => $genre,
         'series' => $series,
         'seriesPosition' => $seriesPosition,
@@ -400,7 +395,8 @@ if (isset($_POST['addMetadataForm'])) {
 if (isset($_POST['editMetadataForm'])) {
     $file = $_POST['file'];
     $title = $_POST['title'];
-    $author = $_POST['author'];
+    $firstName = $_POST['firstName'];
+    $lastName = $_POST['lastName'];
     $genre = $_POST['genre'];
     $series = $_POST['series'];
     $seriesPosition = $_POST['seriesPosition'];
@@ -410,7 +406,7 @@ if (isset($_POST['editMetadataForm'])) {
     // Aktualizacja metadanych w bookData.json
     $bookData[$file] = [
         'title' => $title,
-        'author' => $author,
+        'author' => $firstName . ' ' . $lastName,
         'genre' => $genre,
         'series' => $series,
         'seriesPosition' => $seriesPosition,
@@ -465,7 +461,8 @@ echo '
                 event.preventDefault();
                 var file = $("#file").val();
                 var title = $("#title").val();
-                var author = $("#author").val();
+                var firstName = $("#firstName").val();
+                var lastName = $("#lastName").val();
                 var genre = $("#genre").val();
                 var series = $("#series").val();
                 var seriesPosition = $("#seriesPosition").val();
@@ -481,7 +478,8 @@ echo '
                         addMetadataForm: 1,
                         file: file,
                         title: title,
-                        author: author,
+                        firstName: firstName,
+                        lastName: lastName,
                         genre: genre,
                         series: series,
                         seriesPosition: seriesPosition,
@@ -504,7 +502,8 @@ echo '
                 event.preventDefault();
                 var file = $("#file").val();
                 var title = $("#title").val();
-                var author = $("#author").val();
+                var firstName = $("#firstName").val();
+                var lastName = $("#lastName").val();
                 var genre = $("#genre").val();
                 var series = $("#series").val();
                 var seriesPosition = $("#seriesPosition").val();
@@ -520,7 +519,8 @@ echo '
                         editMetadataForm: 1,
                         file: file,
                         title: title,
-                        author: author,
+                        firstName: firstName,
+                        lastName: lastName,
                         genre: genre,
                         series: series,
                         seriesPosition: seriesPosition,
@@ -545,7 +545,9 @@ echo '
                 var modal = $(this);
                 modal.find("#file").val(bookId);
                 modal.find("#title").val(bookData[bookId].title);
-                modal.find("#author").val(bookData[bookId].author);
+                var authorParts = bookData[bookId].author.split(' ');
+                modal.find("#firstName").val(authorParts[0]);
+                modal.find("#lastName").val(authorParts[1]);
                 modal.find("#genre").val(bookData[bookId].genre);
                 modal.find("#series").val(bookData[bookId].series);
                 modal.find("#seriesPosition").val(bookData[bookId].seriesPosition);
